@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29009.5
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeMap", "CodeMap\CodeMap.csproj", "{1018CFA2-BBB0-4719-B6D6-A2C0C24E2AA5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeMapTests", "CodeMapTests\CodeMapTests.csproj", "{D05097A8-5EA9-4342-A967-AABD2009CCDB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1018CFA2-BBB0-4719-B6D6-A2C0C24E2AA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1018CFA2-BBB0-4719-B6D6-A2C0C24E2AA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1018CFA2-BBB0-4719-B6D6-A2C0C24E2AA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1018CFA2-BBB0-4719-B6D6-A2C0C24E2AA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D05097A8-5EA9-4342-A967-AABD2009CCDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D05097A8-5EA9-4342-A967-AABD2009CCDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D05097A8-5EA9-4342-A967-AABD2009CCDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D05097A8-5EA9-4342-A967-AABD2009CCDB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2800EE59-5E21-4E75-A1D7-245EC13DFDFA}
+	EndGlobalSection
+EndGlobal

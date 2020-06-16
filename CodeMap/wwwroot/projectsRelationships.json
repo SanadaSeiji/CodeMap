@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    { "id": "BProject" },
+    { "id": "CProject" },
+    { "id": "AProject" }
+  ],
+  "links": [
+    {
+      "source": "BProject",
+      "target": "CProject"
+    },
+    {
+      "source": "AProject",
+      "target": "CProject"
+    }
+  ]
+}

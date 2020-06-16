@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>Chord Diagramm</title>
+
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+    <!-- Google Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,900' rel='stylesheet' type='text/css'>
+    <!-- bootstrap 4(!) -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+
+    <style>
+      body {
+        font-size: 12px;
+        font-family: 'Lato', sans-serif;
+        text-align: center;
+        fill: #2B2B2B;
+        cursor: default;
+      }
+
+      @media (min-width: 600px) {
+        #chart{
+          font-size: 16px;
+        }
+        
+        .group path {
+        fill-opacity: .5;
+        }
+        
+        path.chord {
+        stroke: #000;
+        stroke-width: .25px;
+        }
+        
+        #circle:hover path.fade {
+        display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id = "chart"></div>
+  </body>
+
+  <script>
+  ////////////////////////////////////////////////////////////
+  //////////////////////// Set-Up ////////////////////////////
+  ////////////////////////////////////////////////////////////
+
+  var margin = {left:120, top:120, right:120, bottom:120},
+  width = 720,
+  height = 720,
+  outerRadius = Math.min(width, height) / 2 - 10,
+   innerRadius = outerRadius - 24;
+
+   var opacityDefault = 0.8;
+
+
+  d3.csv("/projects.csv", function(names) {
+    d3.json("/matrix.json", function(matrix) {
+
+        var chord = d3.chord()
+                      .padAngle(.04)
+                      .sortSubgroups(d3.descending)
+                      .sortChords(d3.ascending);
+
+        var arc = d3.arc()
+                    .innerRadius(innerRadius*1.01)
+                    .outerRadius(outerRadius);
+
+        var path = d3.ribbon()
+                    .radius(innerRadius);
+
+
+        var svg = d3.select("#chart").append("svg")
+                  .attr("width", width + margin.left + margin.right)
+                  .attr("height", height + margin.top + margin.bottom)
+                  .append("g")
+                  .attr("id", "circle")
+                  .attr("transform", "translate(" + (width/2 + margin.left) + "," + (height/2 + margin.top) + ")")
+                  .datum(chord(matrix));
+
+// Add a group per neighborhood.
+        var outerArcs = svg.selectAll(".group")
+                          .data(function(chords) { return chords.groups; })
+                          .enter().append("g")
+                          .attr("class", "group")
+                          .on("mouseover", mouseover);
+                          //.on("mouseover", fade(.1))
+                          //.on("mouseout", fade(opacityDefault))
+
+                          //.on("click", fade(.1))
+                          //.on("mouseout", mouseoutChord);
+
+         // Add the group arc.
+         outerArcs.append("path")
+           .attr("id", function(d, i) { return "group" + i; })                   
+                    .attr("d", arc)
+                    .style("fill", function(d,i) { return names[i].color; });
+
+////////////////////////////////////////////////////////////
+////////////////////// Append names ////////////////////////
+////////////////////////////////////////////////////////////
+
+            //Append the label names on the outside
+            outerArcs.append("text")
+                    .each(function(d) { d.angle = (d.startAngle + d.endAngle) / 2; })
+                    .attr("dy", ".35em")
+                    .attr("class", "titles")
+                    .attr("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
+                    .attr("transform", function(d) {
+                                        return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
+                                        + "translate(" + (outerRadius + 10) + ")"
+                                        + (d.angle > Math.PI ? "rotate(180)" : "");
+                    })
+                    .text(function(d,i) { return names[i].name; });
+
+
+////////////////////////////////////////////////////////////
+////////////////// Draw inner chords ///////////////////////
+////////////////////////////////////////////////////////////
+
+                    var chord =  svg.selectAll("path.chord")
+                                  .data(function(chords) { return chords; })
+                                  .enter().append("path")
+                                  .attr("class", "chord")
+                                  .style("fill", function(d) { return names[d.source.index].color; })
+                                  .style("opacity", opacityDefault)
+                                  .attr("d", path);
+
+                    // Add an elaborate mouseover title for each chord.
+                        chord.append("title").text(function(d) {
+                                      return names[d.source.index].name
+                                      + " → " + names[d.target.index].name;
+                                      });
+
+////////////////////////////////////////////////////////////
+////////////////// Extra Functions /////////////////////////
+////////////////////////////////////////////////////////////
+
+function mouseover(d, i) {
+chord.classed("fade", function(p) {
+return p.source.index != i
+&& p.target.index != i;
+});
+}
+
+/*
+//Returns an event handler for fading a given chord group.
+function fade(opacity) {
+  return function(d,i) {
+    svg.selectAll("path.chord")
+        .filter(function(d) { return d.source.index != i && d.target.index != i; })
+    .transition()
+        .style("opacity", opacity);
+        
+  };
+}//fade
+
+  //Highlight hovered over chord
+function mouseoverChord(d,i) {
+
+  //Decrease opacity to all
+  svg.selectAll("path.chord")
+    .transition()
+    .style("opacity", 0.1);
+  //Show hovered over chord with full opacity
+  d3.select(this)
+    .transition()
+        .style("opacity", 1);
+
+  //Define and show the tooltip over the mouse location
+ 
+}
+//Bring all chords back to default opacity
+function mouseoutChord(d) {
+  //Hide the tooltip
+ // $('.popover').each(function() {
+  //  $(this).remove();
+ // })
+  //Set opacity back to default for all
+  svg.selectAll("path.chord")
+    .transition()
+    .style("opacity", opacityDefault);
+  }      //function mouseoutChord */
+
+
+    });
+  }); 
+
+ 
+  </script>
+</html>
